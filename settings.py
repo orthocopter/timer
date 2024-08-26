@@ -8,6 +8,9 @@ class SettingsDialog(tk.Toplevel):
         self.title("Timer Settings")
         self.result = None
 
+        # Position the dialog relative to the parent window
+        self.geometry(f"+{parent.winfo_x()}+{parent.winfo_y()}")
+
         tk.Label(self, text="Time (seconds):").grid(row=0, column=0, padx=5, pady=5)
         self.time_entry = tk.Entry(self)
         self.time_entry.insert(0, str(initial_time))
