@@ -1,7 +1,8 @@
+import pygame
+from settings import SettingsDialog
+import time
 import tkinter as tk
 from tkinter import messagebox, simpledialog
-import pygame
-import time
 
 pygame.mixer.init()
 
@@ -45,49 +46,14 @@ def open_settings():
         initial_time.set(new_time)
         interval_seconds.set(new_interval)
         mins, secs = divmod(total_seconds.get(), 60)
-        label.config(text=f'{mins:02d}:{secs:02d}')
-
-class SettingsDialog(tk.Toplevel):
-    def __init__(self, parent, initial_time, initial_interval):
-        super().__init__(parent)
-        self.title("Timer Settings")
-        self.result = None
-
-        tk.Label(self, text="Time (seconds):").grid(row=0, column=0, padx=5, pady=5)
-        self.time_entry = tk.Entry(self)
-        self.time_entry.insert(0, str(initial_time))
-        self.time_entry.grid(row=0, column=1, padx=5, pady=5)
-
-        tk.Label(self, text="Interval (seconds):").grid(row=1, column=0, padx=5, pady=5)
-        self.interval_entry = tk.Entry(self)
-        self.interval_entry.insert(0, str(initial_interval))
-        self.interval_entry.grid(row=1, column=1, padx=5, pady=5)
-
-        tk.Button(self, text="OK", command=self.on_ok).grid(row=2, column=0, padx=5, pady=5)
-        tk.Button(self, text="Cancel", command=self.on_cancel).grid(row=2, column=1, padx=5, pady=5)
-
-    def on_ok(self):
-        try:
-            time = int(self.time_entry.get())
-            interval = int(self.interval_entry.get())
-            if 1 <= time <= 3600 and 0 <= interval <= 3600:
-                self.result = (time, interval)
-                self.destroy()
-            else:
-                messagebox.showerror("Invalid input", "Time must be between 1 and 3600, and interval between 0 and 3600")
-        except ValueError:
-            messagebox.showerror("Invalid input", "Please enter valid numbers")
-
-    def on_cancel(self):
-        self.destroy()
-# Set up the main window
+        label.config(text=f'{mins:02d}:{secs:02d}')# Set up the main window
 root = tk.Tk()
 root.title("Countdown Timer")
 
 # Set up variables
-total_seconds = tk.IntVar(value=900)  # Default to 15 minutes (900 seconds)
+total_seconds = tk.IntVar(value=900)  # Default to 15 minutes
 initial_time = tk.IntVar(value=900)  # Store the initial time value
-interval_seconds = tk.IntVar(value=0)  # Default to 0 (no interval)
+interval_seconds = tk.IntVar(value=300)  # Default to 5 minutes
 
 def set_interval():
     new_interval = simpledialog.askinteger("Interval Settings", "Enter interval in seconds (0 for no interval):", parent=root, minvalue=0, maxvalue=3600)
