@@ -1,8 +1,9 @@
+from config.config import save_config, load_config
 import pygame
 from settings import SettingsDialog
 import time
 import tkinter as tk
-from tkinter import messagebox, simpledialog
+from tkinter import messagebox
 
 pygame.mixer.init()
 
@@ -23,12 +24,12 @@ def start_timer():
             if interval_seconds.get() > 0:
                 interval_counter += 1
                 if interval_counter >= interval_seconds.get():
-                    pygame.mixer.music.load("media/Connected.mp3")
+                    pygame.mixer.music.load("assets/media/Connected.mp3")
                     pygame.mixer.music.play()
                     interval_counter = 0
 
         # Play sound when timer expires
-        pygame.mixer.music.load("media/Concern.mp3")
+        pygame.mixer.music.load("assets/media/Concern.mp3")
         pygame.mixer.music.play()
 
         label.config(text="Time's up!")
@@ -55,11 +56,18 @@ total_seconds = tk.IntVar(value=900)  # Default to 15 minutes
 initial_time = tk.IntVar(value=900)  # Store the initial time value
 interval_seconds = tk.IntVar(value=300)  # Default to 5 minutes
 
-def set_interval():
-    new_interval = simpledialog.askinteger("Interval Settings", "Enter interval in seconds (0 for no interval):", parent=root, minvalue=0, maxvalue=3600)
-    if new_interval is not None:
-        interval_seconds.set(new_interval)
+# Load configuration from file on application start
+config = load_config()
+if config:
+    root.geometry(config['geometry'])
+    initial_time.set(config['time'])
+    interval_seconds.set(config['interval'])
 
+# Save the configuration when closing the window
+def on_closing():
+    save_config(root.geometry(), initial_time.get(), interval_seconds.get())
+    root.destroy()
+root.protocol("WM_DELETE_WINDOW", on_closing)
 
 # Set up the GUI components
 label = tk.Label(root, font=('Helvetica', 72), text="15:00")  # Increased font size
