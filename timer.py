@@ -1,4 +1,10 @@
+# Local imports
 from config.config import save_config, load_config
+from stop_button import StopButton
+
+# External imports
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import pygame
 from settings import SettingsDialog
 import time
@@ -8,12 +14,14 @@ from tkinter import messagebox
 pygame.mixer.init()
 
 def start_timer():
+    global timer_running
+    timer_running = True
     try:
         if total_seconds.get() == 0:
             total_seconds.set(initial_time.get())
         
         interval_counter = 0
-        while total_seconds.get() > 0:
+        while total_seconds.get() > 0 and timer_running:
             mins, secs = divmod(total_seconds.get(), 60)
             time_format = f'{mins:02d}:{secs:02d}'
             label.config(text=time_format)
@@ -28,16 +36,26 @@ def start_timer():
                     pygame.mixer.music.play()
                     interval_counter = 0
 
-        # Play sound when timer expires
-        pygame.mixer.music.load("assets/media/Concern.mp3")
-        pygame.mixer.music.play()
-
-        label.config(text="Time's up!")
-        messagebox.showinfo("Timer", "Time's up!")
+        if timer_running:
+            # Play sound when timer expires
+            pygame.mixer.music.load("assets/media/Concern.mp3")
+            pygame.mixer.music.play()
+            label.config(text="Time's up!")
+            messagebox.showinfo("Timer", "Time's up!")
 
     except ValueError:
-        messagebox.showerror("Invalid input", "Please enter a valid number of seconds")
-        
+        messagebox.showerror("Invalid input", "Please enter a valid number of seconds")        
+
+def stop_timer():
+    global timer_running
+    timer_running = False
+    total_seconds.set(initial_time.get())
+    
+    # Update the label to show the initial time
+    mins, secs = divmod(total_seconds.get(), 60)
+    time_format = f'{mins:02d}:{secs:02d}'
+    label.config(text=time_format)
+
 def open_settings():
     dialog = SettingsDialog(root, initial_time.get(), interval_seconds.get())
     root.wait_window(dialog)
@@ -76,6 +94,9 @@ label.pack(pady=20)
 start_button = tk.Button(root, text="Start Timer", command=start_timer, font=('Helvetica', 18))
 start_button.pack(pady=20)
 
+stop_button = StopButton(master=root, command=stop_timer)
+stop_button.pack(pady=10)
+
 # Add settings button with gear icon
 gear_icon = "⚙"  # Unicode gear symbol
 settings_button = tk.Button(root, text=gear_icon, command=open_settings, font=('Helvetica', 18))
@@ -83,3 +104,4 @@ settings_button.pack(side=tk.RIGHT, padx=10, pady=10)
 
 # Run the main event loop
 root.mainloop()
+
