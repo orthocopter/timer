@@ -11,13 +11,20 @@ def update_ui(time_format):
     root.update()
 
 def on_timeout():
-    messagebox.showinfo("Timer", "Time's up!")
+    label.config(text="Time's up!", fg="red")
+    root.update()
+
+def reset_timer_display():
+    label.config(text=f"{timer_control.initial_time // 60:02d}:{timer_control.initial_time % 60:02d}", fg="white")
+    root.update()
 
 def start_timer():
+    reset_timer_display()
     timer_control.start_timer(update_ui, on_timeout)
 
 def stop_timer():
     timer_control.stop_timer()
+    reset_timer_display()
 
 def open_settings():
     dialog = SettingsDialog(root, timer_control.initial_time, timer_control.interval_seconds)
